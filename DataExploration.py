@@ -109,6 +109,21 @@ def summaryTab(dataframe, groupby_var, sum_var, sort_by_sum = True):
 
     return summary_df[['Sum', 'Percent', 'Cumul_Sum', 'Cumul_Percent']]
 
+
+def describeBy(dataframe, groupby_var, numeric_var):
+    ''' Adds "Non-NaN Count" and "Sum" to df.groupby().describe(). '''
+    by_cnt = dataframe.groupby(groupby_var).agg({groupby_var:'count'})
+    by_cnt_non_null = dataframe.groupby(groupby_var).agg({numeric_var:'count'})
+    by_sum = dataframe.groupby(groupby_var).agg({numeric_var:'sum'})
+    by_desc = dataframe.groupby(groupby_var)[numeric_var].describe().drop('count', axis = 1)
+
+    desc_stats = pd.concat([by_cnt, by_cnt_non_null, by_sum, by_desc], axis = 1)
+    del desc_stats.index.name
+    desc_stats.columns = ['Total Count', 'Non-NaN Count', 'Sum', 'Mean', 'Std. Dev.', 'Min', '25th Pctl',
+                          'Median', '75th Pctl', 'Max']
+
+    return desc_stats
+
 def naPerColumn(dataframe):
     ''' Returns a tabulation of the NaNs for each column in the input dataframe. '''
     na_count = dataframe.isnull().sum()
