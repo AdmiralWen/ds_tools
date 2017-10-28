@@ -109,7 +109,6 @@ def summaryTab(dataframe, groupby_var, sum_var, sort_by_sum = True):
 
     return summary_df[['Sum', 'Percent', 'Cumul_Sum', 'Cumul_Percent']]
 
-
 def describeBy(dataframe, groupby_var, numeric_var):
     ''' Adds "Non-NaN Count" and "Sum" to df.groupby().describe(). '''
     by_cnt = dataframe.groupby(groupby_var).agg({groupby_var:'count'})
