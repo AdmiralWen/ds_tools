@@ -6,6 +6,7 @@ Contains useful functions for data manipulation and exploration. Requires Pandas
 
 dataInfo: Returns a dataframe of dataset properties (Data Types, # Observations, Unique Observations, by column).
 extremeObs: Returns the top n highest and lowest observations of a variable; optional boxplot.
+checkUniqueBy: Checks if a dataframe is unique by a given list of fields.
 freqTab: Returns a dataframe containing the frequency tabulation of a categorical variable.
 summaryTab: Returns a dataframe containing the summary tabulation of a categorical variable (by a summation variable).
 describeBy: Adds "Non-NaN Count" and "Sum" to df.groupby().describe().
@@ -59,6 +60,15 @@ def extremeObs(dataframe, variable, n = 10, boxplot = True, whis = 1.5):
         sns.boxplot(dataframe[variable], whis = whis)
         plt.show()
 
+def checkUniqueBy(dataframe, variables):
+    '''
+        Checks if a dataframe is unique by a given list of fields. The variables argument can be either a single column
+        name (string) or a list. Keep in mind that "unique" doesn't mean the smallest possible number of fields that the
+        dataframe will be unique by.
+    '''
+    l = len(dataframe[variables].drop_duplicates())
+    return l == len(dataframe)
+
 def freqTab(dataframe, variable, drop_na = False, sort_by_count = True):
     '''
         Returns the frequency tabulation of the input variable as a Pandas dataframe. Specify drop_na = True to drop
@@ -74,13 +84,13 @@ def freqTab(dataframe, variable, drop_na = False, sort_by_count = True):
 
     freq_df = pd.DataFrame({"Count":cnt,
                             "Percent":pct,
-                            "Cumul_Count":cnt_cumul,
-                            "Cumul_Percent":pct_cumul
+                            "Cumul. Count":cnt_cumul,
+                            "Cumul. Percent":pct_cumul
                            })
     freq_df['Percent'] = freq_df['Percent'].map('{:,.2%}'.format)
-    freq_df['Cumul_Percent'] = freq_df['Cumul_Percent'].map('{:,.2%}'.format)
+    freq_df['Cumul. Percent'] = freq_df['Cumul. Percent'].map('{:,.2%}'.format)
 
-    return freq_df[['Count', 'Percent', 'Cumul_Count', 'Cumul_Percent']]
+    return freq_df[['Count', 'Percent', 'Cumul. Count', 'Cumul. Percent']]
 
 def summaryTab(dataframe, groupby_var, sum_var, sort_by_sum = True):
     '''
@@ -98,18 +108,18 @@ def summaryTab(dataframe, groupby_var, sum_var, sort_by_sum = True):
 
     summary_df = pd.DataFrame({"Sum":sums,
                                "Percent":pct,
-                               "Cumul_Sum":sums_cumul,
-                               "Cumul_Percent":pct_cumul
+                               "Cumul. Sum":sums_cumul,
+                               "Cumul. Percent":pct_cumul
                               })
     sums_temp[sums_temp.columns[0]].name = None
     summary_df.index = sums_temp[sums_temp.columns[0]]
 
     summary_df['Percent'] = summary_df['Percent'].map('{:,.2%}'.format)
-    summary_df['Cumul_Percent'] = summary_df['Cumul_Percent'].map('{:,.2%}'.format)
+    summary_df['Cumul. Percent'] = summary_df['Cumul. Percent'].map('{:,.2%}'.format)
     summary_df['Sum'] = summary_df['Sum'].map('{:,}'.format)
-    summary_df['Cumul_Sum'] = summary_df['Cumul_Sum'].map('{:,}'.format)
+    summary_df['Cumul. Sum'] = summary_df['Cumul. Sum'].map('{:,}'.format)
 
-    return summary_df[['Sum', 'Percent', 'Cumul_Sum', 'Cumul_Percent']]
+    return summary_df[['Sum', 'Percent', 'Cumul. Sum', 'Cumul. Percent']]
 
 def describeBy(dataframe, groupby_var, numeric_var):
     ''' Adds "Non-NaN Count" and "Sum" to df.groupby().describe(). '''
