@@ -7,6 +7,7 @@ Contains useful functions for data manipulation and exploration. Requires Pandas
 dataInfo: Returns a dataframe of dataset properties (Data Types, # Observations, Unique Observations, by column).
 extremeObs: Returns the top n highest and lowest observations of a variable; optional boxplot.
 checkUniqueBy: Checks if a dataframe is unique by a given list of fields.
+nonUniqueItems: Returns the non-unique items and their non-unique count for the values in the given list of columns.
 freqTab: Returns a dataframe containing the frequency tabulation of a categorical variable.
 summaryTab: Returns a dataframe containing the summary tabulation of a categorical variable (by a summation variable).
 describeBy: Adds "Non-NaN Count" and "Sum" to df.groupby().describe().
@@ -68,6 +69,13 @@ def checkUniqueBy(dataframe, variables):
     '''
     l = len(dataframe[variables].drop_duplicates())
     return l == len(dataframe)
+
+def nonUniqueItems(dataframe, variables):
+    ''' Groups the dataframe by the input variables and returns only the non-unique values of those variables, in decending order. '''
+    tmp = dataframe.groupby(variables).size().reset_index()
+    tmp.rename(columns = {0:'nonUniqueItems_Count'}, inplace = True)
+    tmp = tmp[tmp['nonUniqueItems_Count'] > 1].sort_values('nonUniqueItems_Count', ascending = False).reset_index()
+    return tmp.drop('index', axis = 1)
 
 def freqTab(dataframe, variable, drop_na = False, sort_by_count = True):
     '''
