@@ -3,7 +3,7 @@
 
 ------------------------------------
 
-Contains useful functions for data manipulation, exploration, and modeling.
+Contains useful functions for data manipulation, exploration, and modeling. To see example use cases for most of the functions, please refer to the Examples directory.
 
 #### Requirements:
 - Pandas
