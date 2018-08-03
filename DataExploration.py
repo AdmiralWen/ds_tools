@@ -77,12 +77,15 @@ def nonUniqueItems(dataframe, variables):
     tmp = tmp[tmp['nonUniqueItems_Count'] > 1].sort_values('nonUniqueItems_Count', ascending = False).reset_index()
     return tmp.drop('index', axis = 1)
 
-def freqTab(dataframe, variable, drop_na = False, sort_by_count = True):
+def freqTab(dataframe, variable, drop_na = False, sort_by_count = True, plot = None, fig_size = (16, 8)):
     '''
         Returns the frequency tabulation of the input variable as a Pandas dataframe. Specify drop_na = True to drop
         NaNs from the tabulation (default is False), and specify sort_by_count = False to sort the result alphabetically
-        instead of by the frequency counts (default is True).
+        instead of by the frequency counts (default is True). Use the plot argument to specify the output type: frequency
+        table, graph by count, or graph by percent (None, 'count', and 'percent' respectively).
     '''
+    assert plot is None or plot.lower() in ('count', 'percent'), "Plot must be None, 'count', or 'percent'."
+
     cnt = dataframe[variable].value_counts(sort = sort_by_count, dropna = drop_na)
     if not sort_by_count:
         cnt.sort_index(inplace = True)
@@ -92,13 +95,31 @@ def freqTab(dataframe, variable, drop_na = False, sort_by_count = True):
 
     freq_df = pd.DataFrame({"Count":cnt,
                             "Percent":pct,
-                            "Cumul. Count":cnt_cumul,
-                            "Cumul. Percent":pct_cumul
+                            "Cumul_Count":cnt_cumul,
+                            "Cumul_Percent":pct_cumul
                            })
     freq_df['Percent'] = freq_df['Percent'].map('{:,.2%}'.format)
-    freq_df['Cumul. Percent'] = freq_df['Cumul. Percent'].map('{:,.2%}'.format)
+    freq_df['Cumul_Percent'] = freq_df['Cumul_Percent'].map('{:,.2%}'.format)
 
-    return freq_df[['Count', 'Percent', 'Cumul. Count', 'Cumul. Percent']]
+    # Returns table (plot = None):
+    if not plot:
+        return freq_df[['Count', 'Percent', 'Cumul_Count', 'Cumul_Percent']]
+    # Returns barplot (plot = 'count' or 'percent'):
+    else:
+        if plot.lower() == 'count':
+            plot2 = 'Count'
+        elif plot.lower() == 'percent':
+            plot2 = 'Percent'
+            freq_df['Percent'] = freq_df['Percent'].map(lambda x: float(x[:-1])/100)
+        plt.figure(figsize = fig_size)
+        ax = sns.barplot(x = freq_df.index, y = plot2, data = freq_df)
+        plt.xticks(rotation = 'vertical', fontsize = 12)
+        plt.yticks(fontsize = 12)
+        plt.ylabel(plot2)
+        if plot.lower() == 'percent':
+            yvals = ax.get_yticks()
+            ax.set_yticklabels(['{:,.2%}'.format(x) for x in yvals])
+        plt.show()
 
 def summaryTab(dataframe, groupby_var, sum_var, sort_by_sum = True):
     '''
