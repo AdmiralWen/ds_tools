@@ -14,7 +14,9 @@ Contains useful functions for data manipulation, exploration, and modeling. To s
 - Itertools
 
 #### Modules & Files:
-- **DataExploration.py:** Useful functions for exploratory data analysis and data manipulation.
-- **ModoleVisuals.py:** Useful functions for plotting and visualizing modeling results.
-- **MiscFunctions.py:** Additional miscellaneous functions.
-- **Examples/:** Example use cases.
+- **DataExploration:**
+    - **DataExploration.py:** Useful functions for exploratory data analysis and data manipulation.
+    - **ModoleVisuals.py:** Useful functions for plotting and visualizing modeling results.
+    - **MiscFunctions.py:** Additional miscellaneous functions.
+
+- **Examples:** Example use cases.
