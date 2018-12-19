@@ -254,7 +254,7 @@ def corrHeatmap(dataframe, vars_list, sns_font_scale = 2, fig_size = (16, 16)):
     ax.set(title = 'Correlation Matrix of Selected Variables')
     plt.show()
 
-def customBoxplot(dataframe, category_field, plot_fields, title = None, box_color = 'lightsteelblue', bg_color = 'whitesmoke'):
+def customBoxplot(dataframe, category_field, plot_fields, n_obs_field = None, title = None, box_color = 'lightsteelblue', bg_color = 'whitesmoke'):
     '''
         Creates a custom boxplot based on pre-calculated precentile metrics. Function requires the percentile metrics to be in a dataframe. Each
         row of the dataframe should contain the name of the category we have metrics for, as well as 5 additional columns of percentile metrics in
@@ -266,7 +266,8 @@ def customBoxplot(dataframe, category_field, plot_fields, title = None, box_colo
             ... ... ...
         
         The function will create a horizontal boxplot by category (defined by the category_field argument), where the values of the boxplot - left
-        whisker, left box, median, right box, right whisker - are given by the subsequent 5 fields (defined by the plot_fields argument). You can
+        whisker, left box, median, right box, right whisker - are given by the subsequent 5 fields (defined by the plot_fields argument). Use the
+        n_obs_field to optionally add a display for the number of observations per box, which should also be a field in the input dataframe. You can
         also optionally adjust the title and color arguments.
     '''
     assert len(plot_fields) == 5, "plot_fields must be a list of length 5."
@@ -293,5 +294,14 @@ def customBoxplot(dataframe, category_field, plot_fields, title = None, box_colo
     # Chart title:
     if title:
         ax.set_title(title, fontsize = 16)
+
+    # Display n_obs for each box:
+    if n_obs_field:
+        n_obs = ['n = ' + str(int(i)) for i in dataframe[n_obs_field].values]
+        medians = dataframe[plot_fields[-1]].values
+        for box in range(len(n_obs)):
+            ax.text(medians[box] + 0.1, box + 1, n_obs[box], verticalalignment = 'center', size = 'medium', color = 'black', weight = 'semibold')
+
+        plt.xlim(ax.get_xlim()[0], ax.get_xlim()[1]*1.1)
 
     plt.show()
