@@ -254,7 +254,8 @@ def corrHeatmap(dataframe, vars_list, sns_font_scale = 2, fig_size = (16, 16)):
     ax.set(title = 'Correlation Matrix of Selected Variables')
     plt.show()
 
-def customBoxplot(dataframe, category_field, plot_fields, n_obs_field = None, title = None, box_color = 'lightsteelblue', bg_color = 'whitesmoke'):
+def customBoxplot(dataframe, category_field, plot_fields, n_obs_field = None, title = None, figsize = (12, 8), box_color = 'lightsteelblue', bg_color = 'whitesmoke',
+                  n_obs_size = 12, n_obs_display_offset = 1, x_label_size = 12, y_label_size = 12, x_axis_title = '', x_title_size = 12):
     '''
         Creates a custom boxplot based on pre-calculated precentile metrics. Function requires the percentile metrics to be in a dataframe. Each
         row of the dataframe should contain the name of the category we have metrics for, as well as 5 additional columns of percentile metrics in
@@ -271,7 +272,7 @@ def customBoxplot(dataframe, category_field, plot_fields, n_obs_field = None, ti
         also optionally adjust the title and color arguments.
     '''
     assert len(plot_fields) == 5, "plot_fields must be a list of length 5."
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize = figsize)
 
     # Turn input dataframe into a list-of-lists representation:
     data_list = dataframe[plot_fields].values.tolist()
@@ -281,10 +282,14 @@ def customBoxplot(dataframe, category_field, plot_fields, n_obs_field = None, ti
     for patch in box_plot['boxes']:
         patch.set_facecolor(box_color)
 
-    # Y-Axis labels:
+    # Y-Axis adjustments:
     ytickNames = plt.setp(ax, yticklabels = list(dataframe[category_field]))
-    plt.setp(ytickNames, fontsize = 12)
+    plt.setp(ytickNames, fontsize = y_label_size)
     plt.gca().invert_yaxis()
+
+    # X-Axis adjustments:
+    plt.xticks(fontsize = x_label_size)
+    plt.xlabel(x_axis_title, size = x_title_size)
 
     # Chart background grid and color:
     ax.xaxis.grid(True)
@@ -300,7 +305,7 @@ def customBoxplot(dataframe, category_field, plot_fields, n_obs_field = None, ti
         n_obs = ['n = ' + str(int(i)) for i in dataframe[n_obs_field].values]
         medians = dataframe[plot_fields[-1]].values
         for box in range(len(n_obs)):
-            ax.text(medians[box] + 0.1, box + 1, n_obs[box], verticalalignment = 'center', size = 'medium', color = 'black', weight = 'semibold')
+            ax.text(medians[box] + n_obs_display_offset, box + 1, n_obs[box], verticalalignment = 'center', size = n_obs_size, color = 'black', weight = 'semibold')
 
         plt.xlim(ax.get_xlim()[0], ax.get_xlim()[1]*1.1)
 
