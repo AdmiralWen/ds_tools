@@ -238,14 +238,15 @@ def wtdQuantile(dataframe, var, weight = None, n = 10):
         quantile[-1:] = n-1
         return quantile.map(int)
 
-def corrHeatmap(dataframe, vars_list, sns_font_scale = 2, fig_size = (16, 16)):
+def corrHeatmap(dataframe, vars_list, method = 'pearson', sns_font_scale = 2, fig_size = (16, 16)):
     '''
         Creates a heatmap of the correlation matrix using the input dataframe and the variables list. The var_list
-        argument should be a list of variable names (strings) that you wish to compute correlations for. Use
-        sns_font_scale and fig_size to set the font and graph sizes.
+        argument should be a list of variable names (strings) that you wish to compute correlations for, the method
+        argument is used to specify what type of correlation (pearson, spearman, kendall). Use sns_font_scale and
+        fig_size to set the font and graph sizes.
     '''
     sns.set(font_scale = sns_font_scale)
-    df_corrmat = dataframe[vars_list].corr()
+    df_corrmat = dataframe[vars_list].corr(method = method)
 
     f, ax = plt.subplots(figsize = fig_size)
     sns.heatmap(df_corrmat, square=True, linewidths=0.5, annot=True)
