@@ -5,6 +5,7 @@ Author: Brandon Wen
 Contains useful functions for plotting and visualizing modeling results.
 
 plotConfusionMatrix: Plots the confusion matrix heatmap given the true and predicted labels.
+normalizedGini: Computes and/or plots the normalized Gini coefficient given the true and predicted response variables.
 rfFeatureImportance: Plots the feature importance graph for random forest models.
 """
 
@@ -55,6 +56,44 @@ def plotConfusionMatrix(true_labels, pred_labels, normalize = False, title = Non
     plt.xlabel('Predicted Labels')
 
     plt.show()
+
+def _gini(dataframe, actual, pred):
+    ''' Computes the Gini coefficient given the input actual and predicted response variables. Helper function used by normalizedGini(). '''
+    gini_df = dataframe.sort_values(by = pred, ascending = True)
+    gini_df['cumul_actual'] = gini_df[actual].cumsum()
+    gini_df['cumul_pct'] = gini_df['cumul_actual']/max(gini_df['cumul_actual'])
+    gini_df['cumul_lag'] = gini_df['cumul_pct'].shift(-1)
+    gini_df['trpd_vol'] = (gini_df['cumul_lag'] + gini_df['cumul_pct'])/(2*len(gini_df))
+    return gini_df, round(2*(0.5-sum(gini_df['trpd_vol'][:-1])), 6)
+
+def normalizedGini(dataframe, actual, pred, plot = False, xlabel = 'Cumulative %-Exposures', ylabel = 'Cumulative %-Losses'):
+    '''
+        Computes the normalized Gini coefficient given the actual and predicted response variables. If the plot argument is set to True,
+        the function will return a plot of the Gini lorenze curve with the normalized Gini coefficient overlaid.
+    '''
+    gini_df, gini = _gini(dataframe, actual, pred)
+    _, gini_max = _gini(dataframe, actual, actual)
+    gini_norm = round(gini/gini_max, 6)
+
+    n = int(len(gini_df)/100) + 1
+    if len(gini_df) % n == 0:
+        st_row = n - 1
+    else:
+        st_row = len(gini_df) % n - 1
+    gini_df_s = gini_df.iloc[st_row::n].copy().reset_index(drop = True)
+
+    if plot == False:
+        return gini_norm
+    else:
+        ax = sns.lineplot(data = gini_df_s, x = gini_df_s.index/100, y = 'cumul_pct')
+        x, y = np.linspace(*ax.get_xlim()), np.linspace(*ax.get_ylim())
+        ax.plot(x, x)
+        plt.text(0.08, 0.98, 'Gini: {}'.format(gini_norm), horizontalalignment = 'center', verticalalignment = 'center')
+        plt.title('Gini Curve')
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.show()
+
 
 #################
 # Random Forest #
