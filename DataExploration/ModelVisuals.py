@@ -86,10 +86,11 @@ def normalizedGini(dataframe, actual, pred, plot = False, xlabel = 'Cumulative %
         return gini_norm
     else:
         ax = sns.lineplot(data = gini_df_s, x = gini_df_s.index/100, y = 'cumul_pct')
-        x, y = np.linspace(*ax.get_xlim()), np.linspace(*ax.get_ylim())
-        ax.plot(x, x)
-        plt.text(0.08, 0.98, 'Gini: {}'.format(gini_norm), horizontalalignment = 'center', verticalalignment = 'center')
+        ax.plot(np.linspace(0, 1), np.linspace(0, 1))
+        plt.text(0.12, 0.98, 'Normalized Gini: {}'.format(gini_norm), horizontalalignment = 'center', verticalalignment = 'center')
         plt.title('Gini Curve')
+        plt.xlim(-0.02, 1.02)
+        plt.ylim(-0.02, 1.02)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.show()
