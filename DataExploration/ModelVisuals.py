@@ -1,5 +1,5 @@
 """
-Modeling Visualizations
+Modeling and Evaluation Visualizations
 Author: Brandon Wen
 
 Contains useful functions for plotting and visualizing modeling results.
@@ -16,15 +16,30 @@ import seaborn as sns
 import itertools
 
 from sklearn.metrics import confusion_matrix
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 ###########
 # General #
 
-def plotConfusionMatrix(true_labels, pred_labels, normalize = False, title = None, cmap = plt.cm.Blues, decimals = 2, x_tick_rotation = 0):
+def plot_confusion_matrix(ax, true_labels, pred_labels, normalize = False, cmap = plt.cm.Blues, show_colorbar = False,
+                          title = None, title_size = 18, axis_label_size = 16, data_label_size = 15, data_label_decimals = 2,
+                          x_tick_size = 14, x_tick_rotation = 0, x_tick_horiz_align = 'center', y_tick_size = 14):
     '''
         Plots the confusion matrix heatmap given the true and predicted labels, which can be either Pandas series or Numpy arrays.
-        Use the normalize argument to display a normalized confusion matrix. The remaining arguments are used to control aesthetics.
+        Use the normalize argument to display a normalized confusion matrix. Requires a Matplotlib axis object to be passed to the
+        ax argument. The remaining arguments are used to control aesthetics.
+
+        Example:
+        --------------------
+        import random
+        t = [random.randrange(0, 2, 1) for i in range(50)]
+        p = [random.randrange(0, 2, 1) for i in range(50)]
+        fig, ax = plt.subplots(1, 2, figsize = (10, 8))
+        plot_confusion_matrix(ax[0], t, p, normalize = False, title = 'Test Plot 1', cmap = plt.cm.Blues)
+        plot_confusion_matrix(ax[1], t, p, normalize = True, title = 'Test Plot 2', cmap = plt.cm.Blues)
+        plt.show()
     '''
+
     cm = confusion_matrix(true_labels, pred_labels)
     classes = sorted(list(set(true_labels).union(set(pred_labels))))
 
@@ -35,71 +50,119 @@ def plotConfusionMatrix(true_labels, pred_labels, normalize = False, title = Non
         title = 'Normalized Confusion Matrix' if normalize else 'Confusion Matrix'
 
     # Plot color-coded matrix; use the cmap argument to control the color map:
-    plt.imshow(cm, interpolation = 'nearest', cmap = cmap)
-    plt.title(title)
-    plt.colorbar()
+    im = ax.imshow(cm, interpolation = 'nearest', cmap = cmap)
+    if show_colorbar:
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes('right', size = '5%', pad = 0.1)
+        fig.colorbar(im, cax = cax, orientation = 'vertical')
+
+    # Title and X/Y labels:
+    ax.set_title(title, size = title_size)
+    ax.set_ylabel('True Labels', size = axis_label_size)
+    ax.set_xlabel('Predicted Labels', size = axis_label_size)
+
+    # X and Y ticks:
     tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation = x_tick_rotation)
-    plt.yticks(tick_marks, classes)
+    ax.set_xticks([0, 1])
+    ax.set_xticklabels(classes, rotation = x_tick_rotation, ha = x_tick_horiz_align, size = x_tick_size)
+    ax.set_yticks([0, 1])
+    ax.set_yticklabels(classes, rotation = 0, va = 'center', size = y_tick_size)
 
-    # Add numerical overlay:
-    fmt = '.{0}f'.format(decimals) if normalize else 'd'
-    thresh = cm.max()/2.
+    # Add numerical overlay for data values:
+    fmt = '.{0}f'.format(data_label_decimals) if normalize else 'd'
+    thresh = (cm.max() + cm.min())/2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
+        ax.text(j, i, format(cm[i, j], fmt),
                  horizontalalignment = "center",
-                 color = "white" if cm[i, j] > thresh else "black")
+                 color = "white" if cm[i, j] > thresh else "black", size = data_label_size)
 
-    # Add X & Y labels:
     plt.tight_layout()
-    plt.ylabel('True Labels')
-    plt.xlabel('Predicted Labels')
 
-    plt.show()
+def _gini_raw(actual, predicted, weight = None):
+    ''' Computes the raw Gini coefficient given the input actual and predicted response variables. Helper function used by gini() and gini_plot(). '''
 
-def _gini(dataframe, actual, pred):
-    ''' Computes the Gini coefficient given the input actual and predicted response variables. Helper function used by normalizedGini(). '''
-    gini_df = dataframe.sort_values(by = pred, ascending = True)
-    gini_df['cumul_actual'] = gini_df[actual].cumsum()
-    gini_df['cumul_pct'] = gini_df['cumul_actual']/max(gini_df['cumul_actual'])
-    gini_df['cumul_lag'] = gini_df['cumul_pct'].shift(-1)
-    gini_df['trpd_vol'] = (gini_df['cumul_lag'] + gini_df['cumul_pct'])/(2*len(gini_df))
-    return gini_df, round(2*(0.5-sum(gini_df['trpd_vol'][:-1])), 6)
+    # Dummy weights if none are given:
+    if weight is None:
+        weight = np.ones(len(actual))
 
-def normalizedGini(dataframe, actual, pred, plot = False, xlabel = 'Cumulative %-Exposures', ylabel = 'Cumulative %-Losses'):
+    # Basic check for array lengths:
+    if len(actual) != len(predicted) or len(actual) != len(weight):
+        raise Exception('Actual, Predicted, and Weight arrays must be of equal length.')
+
+    # Compute sort order and cumsum calculations:
+    srt_order = predicted.argsort()
+    pred_srt, actual_srt, weight_srt = np.array(predicted[srt_order]), np.array(actual[srt_order]), np.array(weight[srt_order])
+    cumul_actual, cumul_weight = np.cumsum(actual_srt), np.cumsum(weight_srt)
+    cumul_actual_pct, cumul_weight_pct = cumul_actual/cumul_actual[-1], cumul_weight/cumul_weight[-1]
+    cumul_actual_pct_lag, cumul_weight_pct_lag = np.append(0, cumul_actual_pct[:-1]), np.append(0, cumul_weight_pct[:-1])
+
+    # Gini coefficient using trapezoidal method:
+    trpz_area = (cumul_weight_pct - cumul_weight_pct_lag)*(cumul_actual_pct + cumul_actual_pct_lag)/2
+    return 2*(0.5 - sum(trpz_area))
+
+def gini(actual, predicted, weight = None, normalize = True):
     '''
-        Computes the normalized Gini coefficient given the actual and predicted response variables. If the plot argument is set to True,
-        the function will return a plot of the Gini lorenze curve with the normalized Gini coefficient overlaid.
+        Computes the Gini coefficient given the actual, predicted, and weight (optional) variables. Specify normalize = True for normalized Gini.
+        Input can be either Pandas series or Numpy arrays.
     '''
-    gini_df, gini = _gini(dataframe, actual, pred)
-    _, gini_max = _gini(dataframe, actual, actual)
-    gini_norm = round(gini/gini_max, 6)
 
-    n = int(len(gini_df)/100) + 1
-    if len(gini_df) % n == 0:
-        st_row = n - 1
+    if normalize:
+        return _gini_raw(actual, predicted, weight)/_gini_raw(actual, actual, weight)
     else:
-        st_row = len(gini_df) % n - 1
-    gini_df_s = gini_df.iloc[st_row::n].copy().reset_index(drop = True)
+        return _gini_raw(actual, predicted, weight)
 
-    if plot == False:
-        return gini_norm
-    else:
-        ax = sns.lineplot(data = gini_df_s, x = gini_df_s.index/100, y = 'cumul_pct')
-        ax.plot(np.linspace(0, 1), np.linspace(0, 1))
-        plt.text(0.12, 0.98, 'Normalized Gini: {}'.format(gini_norm), horizontalalignment = 'center', verticalalignment = 'center')
-        plt.title('Gini Curve')
-        plt.xlim(-0.02, 1.02)
-        plt.ylim(-0.02, 1.02)
-        plt.xlabel(xlabel)
-        plt.ylabel(ylabel)
+def gini_plot(ax, actual, predicted, weight = None, normalize = True,
+              title = 'Gini Lorenz Plot', x_axis_label = 'Cumulative %-Exposures', y_axis_label = 'Cumulative %-Losses',
+              title_size = 16, axis_label_size = 14, annotation_size = 14, axis_tick_size = 12):
+    '''
+        Plots the Gini Lorenz curve for a given set of actual and predicted values. Inputs can be either Pandas series or Numpy
+        arrays. Specify normalize = True to display the normalized Gini rather than the raw Gini in the plot. Requires a Matplotlib
+        axis object to be passed to the ax argument The remaining arguments are used to control aesthetics.
+
+        Example:
+        --------------------
+        import random
+        t = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6])
+        p = np.array([0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.31, 0.4, 0.73, 0.31, 0.4, 0.6, 0.2, 0.32, 0.53, 0.74, 0.1, 0.34,
+                      0.9, 0.2, 0.11, 0.71, 0.3, 0.51, 0.61, 0.72, 0.52, 0.29, 0.8])
+        w = np.array([8, 3, 4, 9, 6, 2, 13, 8, 11, 8, 7, 9, 8, 5, 13, 2, 7, 10, 16, 6, 8, 10, 1, 11, 15, 14, 7, 10, 12, 11])
+        r = np.array([round(random.random(), 1) for i in range(30)])
+        fig, ax = plt.subplots(1, 2, figsize = (12, 6))
+        gini_plot(ax[0], actual = t, predicted = np.array(r), weight = w, normalize = False, title = 'Example Plot - Random Predictions')
+        gini_plot(ax[1], actual = t, predicted = p, weight = w, normalize = True, title = 'Example Plot - Simulated Predictions')
         plt.show()
+    '''
+
+    # Gini result:
+    gini_rslt = round(gini(actual, predicted, weight, normalize), 5)
+
+    # Create plot vectors:
+    srt_order = predicted.argsort()
+    pred_srt, actual_srt, weight_srt = np.array(predicted[srt_order]), np.array(actual[srt_order]), np.array(weight[srt_order])
+    cumul_actual, cumul_weight = np.cumsum(actual_srt), np.cumsum(weight_srt)
+    cumul_actual_pct, cumul_weight_pct = cumul_actual/cumul_actual[-1], cumul_weight/cumul_weight[-1]
+
+    # Plot:
+    sns.lineplot(x = cumul_weight_pct, y = cumul_actual_pct, ax = ax)
+    ax.plot(np.linspace(0, 1), np.linspace(0, 1))
+
+    # Annotation text:
+    pref_txt = 'Normalized Gini: {}' if normalize is True else 'Gini: {}'
+    ax.text(0, 1, pref_txt.format(gini_rslt), horizontalalignment = 'left', verticalalignment = 'center', size = annotation_size)
+
+    # Graph and axes titles:
+    ax.set_title(title, size = title_size)
+    ax.set_xlabel(x_axis_label, size = axis_label_size)
+    ax.set_ylabel(y_axis_label, size = axis_label_size)
+    ax.tick_params(axis = 'both', which = 'major', labelsize = axis_tick_size)
+
+    plt.tight_layout()
 
 
 #################
 # Random Forest #
 
-def rfFeatureImportance(data_X, rf_model, sns_font_scale = 2):
+def rf_feature_importance(data_X, rf_model, sns_font_scale = 2):
 	'''
 		Feature importance graph for random forest models. Use the sns_font_scale argument to scale the font size.
 		

@@ -1,5 +1,5 @@
 """
-Data Exploration
+Data Exploration Tools
 Author: Brandon Wen
 
 Contains useful functions for data manipulation and exploration. Requires Pandas, Numpy, Matplotlib, and Seaborn.

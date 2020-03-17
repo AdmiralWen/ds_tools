@@ -12,8 +12,8 @@ import boto3, json
 import psycopg2, psycopg2.extras
 
 
-def dfFromRSQuery(env, rs_host, rs_port, rs_user, rs_password, query_string, timer = False):
-    ''' Creates a Pandas dataframe from a RedShift SQL query. The query_string argument should be your SQL string. '''
+def df_from_redshift(env, rs_host, rs_port, rs_user, rs_password, query_string, timer = False):
+    ''' Creates a Pandas dataframe from an AWS RedShift SQL query. The query_string argument should be your SQL string. '''
     t0 = time.time()
     con = psycopg2.connect(dbname=env, host=rs_host, port=rs_port, user=rs_user, password=rs_password)
     cur = con.cursor(cursor_factory=psycopg2.extras.DictCursor)
