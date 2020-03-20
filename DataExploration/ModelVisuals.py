@@ -25,19 +25,36 @@ def plot_confusion_matrix(ax, true_labels, pred_labels, normalize = False, cmap 
                           title = None, title_size = 18, axis_label_size = 16, data_label_size = 15, data_label_decimals = 2,
                           x_tick_size = 14, x_tick_rotation = 0, x_tick_horiz_align = 'center', y_tick_size = 14):
     '''
-        Plots the confusion matrix heatmap given the true and predicted labels, which can be either Pandas series or Numpy arrays.
-        Use the normalize argument to display a normalized confusion matrix. Requires a Matplotlib axis object to be passed to the
-        ax argument. The remaining arguments are used to control aesthetics.
+    Plots the confusion matrix heatmap given the true and predicted labels, which can be either Pandas series or Numpy arrays.
+    Use the normalize argument to display a normalized confusion matrix. Requires a Matplotlib axis object to be passed to the
+    ax argument. The remaining arguments are used to control aesthetics.
 
-        Example:
-        --------------------
-        import random
-        t = [random.randrange(0, 2, 1) for i in range(50)]
-        p = [random.randrange(0, 2, 1) for i in range(50)]
-        fig, ax = plt.subplots(1, 2, figsize = (10, 8))
-        plot_confusion_matrix(ax[0], t, p, normalize = False, title = 'Test Plot 1', cmap = plt.cm.Blues)
-        plot_confusion_matrix(ax[1], t, p, normalize = True, title = 'Test Plot 2', cmap = plt.cm.Blues)
-        plt.show()
+    Required Parameters:
+    --------------------
+    ax: a matplotlib axes object
+        Usually defined by plt.subplots().
+    true_labels: numpy array or pandas series
+        A series representing the true class lables.
+    pred_labels: numpy array or pandas series
+        A series representing the predicted class labels.
+    normalize: boolean
+        Used to specify whether or not to display the normalized confusion matrix (percentages) rather than the regular
+        confusion matrix (counts). Default False.
+
+    Returns:
+    --------------------
+    None; wrap function into a plt.subplot() block to create plots. See Example.
+
+    Example:
+    --------------------
+    >> import random
+    >> t = [random.randrange(0, 2, 1) for i in range(50)]
+    >> p = [random.randrange(0, 2, 1) for i in range(50)]
+
+    >> fig, ax = plt.subplots(1, 2, figsize = (10, 8))
+    >> plot_confusion_matrix(ax[0], t, p, normalize = False, title = 'Test Plot 1', cmap = plt.cm.Blues)
+    >> plot_confusion_matrix(ax[1], t, p, normalize = True, title = 'Test Plot 2', cmap = plt.cm.Blues)
+    >> plt.show()
     '''
 
     cm = confusion_matrix(true_labels, pred_labels)
@@ -102,8 +119,31 @@ def _gini_raw(actual, predicted, weight = None):
 
 def gini(actual, predicted, weight = None, normalize = True):
     '''
-        Computes the Gini coefficient given the actual, predicted, and weight (optional) variables. Specify normalize = True for normalized Gini.
-        Input can be either Pandas series or Numpy arrays.
+    Computes the Gini coefficient given the actual, predicted, and weight (optional) variables. Specify normalize = True for normalized Gini.
+    Input can be either Pandas series or Numpy arrays.
+
+    Parameters:
+    --------------------
+    actual: numpy array or pandas series
+        A series/array of the true target variable.
+    predicted: numpy array or pandas series
+        A series/array of the predicted target labels.
+    weight: numpy array or pandas series
+        Used this to specify weighted Gini coefficient, default None.
+    normalize: boolean
+        Used to specify normalized vs raw Gini, default True.
+
+    Returns:
+    --------------------
+    float
+
+    Example:
+    --------------------
+    >> t = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6])
+    >> p = np.array([0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.31, 0.4, 0.73, 0.31, 0.4, 0.6, 0.2, 0.32, 0.53, 0.74, 0.1, 0.34,
+                     0.9, 0.2, 0.11, 0.71, 0.3, 0.51, 0.61, 0.72, 0.52, 0.29, 0.8])
+    >> w = np.array([8, 3, 4, 9, 6, 2, 13, 8, 11, 8, 7, 9, 8, 5, 13, 2, 7, 10, 16, 6, 8, 10, 1, 11, 15, 14, 7, 10, 12, 11])
+    >> gini(t, p, weight = w, normalize = True)
     '''
 
     if normalize:
@@ -115,22 +155,40 @@ def gini_plot(ax, actual, predicted, weight = None, normalize = True,
               title = 'Gini Lorenz Plot', x_axis_label = 'Cumulative %-Exposures', y_axis_label = 'Cumulative %-Losses',
               title_size = 16, axis_label_size = 14, annotation_size = 14, axis_tick_size = 12):
     '''
-        Plots the Gini Lorenz curve for a given set of actual and predicted values. Inputs can be either Pandas series or Numpy
-        arrays. Specify normalize = True to display the normalized Gini rather than the raw Gini in the plot. Requires a Matplotlib
-        axis object to be passed to the ax argument The remaining arguments are used to control aesthetics.
+    Plots the Gini Lorenz curve for a given set of actual and predicted values. Inputs can be either Pandas series or Numpy
+    arrays. Specify normalize = True to display the normalized Gini rather than the raw Gini in the plot. Requires a Matplotlib
+    axis object to be passed to the ax argument The remaining arguments are used to control aesthetics.
 
-        Example:
-        --------------------
-        import random
-        t = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6])
-        p = np.array([0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.31, 0.4, 0.73, 0.31, 0.4, 0.6, 0.2, 0.32, 0.53, 0.74, 0.1, 0.34,
-                      0.9, 0.2, 0.11, 0.71, 0.3, 0.51, 0.61, 0.72, 0.52, 0.29, 0.8])
-        w = np.array([8, 3, 4, 9, 6, 2, 13, 8, 11, 8, 7, 9, 8, 5, 13, 2, 7, 10, 16, 6, 8, 10, 1, 11, 15, 14, 7, 10, 12, 11])
-        r = np.array([round(random.random(), 1) for i in range(30)])
-        fig, ax = plt.subplots(1, 2, figsize = (12, 6))
-        gini_plot(ax[0], actual = t, predicted = np.array(r), weight = w, normalize = False, title = 'Example Plot - Random Predictions')
-        gini_plot(ax[1], actual = t, predicted = p, weight = w, normalize = True, title = 'Example Plot - Simulated Predictions')
-        plt.show()
+    Required Parameters:
+    --------------------
+    ax: a matplotlib axis object
+        Usually defined by plt.subplots().
+    actual: numpy array or pandas series
+        A series/array of the true target variable.
+    predicted: numpy array or pandas series
+        A series/array of the predicted target labels.
+    weight: numpy array or pandas series
+        Used this to specify weighted Gini coefficient, default None.
+    normalize: boolean
+        Used to specify normalized vs raw Gini, default True.
+
+    Returns:
+    --------------------
+    None; wrap function into a plt.subplot() block to create plots. See Example.
+
+    Example:
+    --------------------
+    import random
+    >> t = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6])
+    >> p = np.array([0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.31, 0.4, 0.73, 0.31, 0.4, 0.6, 0.2, 0.32, 0.53, 0.74, 0.1, 0.34,
+                     0.9, 0.2, 0.11, 0.71, 0.3, 0.51, 0.61, 0.72, 0.52, 0.29, 0.8])
+    >> w = np.array([8, 3, 4, 9, 6, 2, 13, 8, 11, 8, 7, 9, 8, 5, 13, 2, 7, 10, 16, 6, 8, 10, 1, 11, 15, 14, 7, 10, 12, 11])
+    >> r = np.array([round(random.random(), 1) for i in range(30)])
+
+    >> fig, ax = plt.subplots(1, 2, figsize = (12, 6))
+    >> gini_plot(ax[0], actual = t, predicted = np.array(r), weight = w, normalize = False, title = 'Example Plot - Random Predictions')
+    >> gini_plot(ax[1], actual = t, predicted = p, weight = w, normalize = True, title = 'Example Plot - Simulated Predictions')
+    >> plt.show()
     '''
 
     # Gini result:
@@ -164,11 +222,20 @@ def gini_plot(ax, actual, predicted, weight = None, normalize = True,
 
 def rf_feature_importance(data_X, rf_model, sns_font_scale = 2):
 	'''
-		Feature importance graph for random forest models. Use the sns_font_scale argument to scale the font size.
-		
-		data_X: the matrix of explanatory variables used as the input of the random forest model (the "X" matrix)
-		rf_model: the random forest model object
+    Feature importance graph for random forest models. Use the sns_font_scale argument to scale the font size.
+
+    Parameters:
+    --------------------
+    data_X: numpy 2d-array
+        The matrix of explanatory variables used as the input of the random forest model (the "X" matrix).
+    rf_model: scikit-learn RandomForestClassifier object
+        The trained random forest model object from scikit-learn.
+
+    Returns:
+    --------------------
+    None; function plots output directly.
 	'''
+
 	sns.set(font_scale = sns_font_scale)
 	features_list = data_X.columns.values
 	feature_importance = rf_model.feature_importances_
