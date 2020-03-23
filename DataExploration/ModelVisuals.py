@@ -178,7 +178,7 @@ def gini_plot(ax, actual, predicted, weight = None, normalize = True,
 
     Example:
     --------------------
-    import random
+    >> import random
     >> t = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6])
     >> p = np.array([0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.31, 0.4, 0.73, 0.31, 0.4, 0.6, 0.2, 0.32, 0.53, 0.74, 0.1, 0.34,
                      0.9, 0.2, 0.11, 0.71, 0.3, 0.51, 0.61, 0.72, 0.52, 0.29, 0.8])
@@ -186,7 +186,7 @@ def gini_plot(ax, actual, predicted, weight = None, normalize = True,
     >> r = np.array([round(random.random(), 1) for i in range(30)])
 
     >> fig, ax = plt.subplots(1, 2, figsize = (12, 6))
-    >> gini_plot(ax[0], actual = t, predicted = np.array(r), weight = w, normalize = False, title = 'Example Plot - Random Predictions')
+    >> gini_plot(ax[0], actual = t, predicted = r, weight = w, normalize = False, title = 'Example Plot - Random Predictions')
     >> gini_plot(ax[1], actual = t, predicted = p, weight = w, normalize = True, title = 'Example Plot - Simulated Predictions')
     >> plt.show()
     '''
