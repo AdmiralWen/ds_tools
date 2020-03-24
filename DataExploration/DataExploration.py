@@ -102,7 +102,7 @@ def check_unique_by(dataframe, variables):
     l = len(dataframe[variables].drop_duplicates())
     return l == len(dataframe)
 
-def non_Unique_items(dataframe, variables):
+def non_unique_items(dataframe, variables):
     '''
     Groups the dataframe by the input variables and returns only the non-unique values of those variables, in decending order.
 
