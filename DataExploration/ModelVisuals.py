@@ -108,7 +108,7 @@ def _gini_raw(actual, predicted, weight = None):
 
     # Compute sort order and cumsum calculations:
     srt_order = predicted.argsort()
-    pred_srt, actual_srt, weight_srt = np.array(predicted[srt_order]), np.array(actual[srt_order]), np.array(weight[srt_order])
+    pred_srt, actual_srt, weight_srt = np.array(predicted)[srt_order], np.array(actual)[srt_order], np.array(weight)[srt_order]
     cumul_actual, cumul_weight = np.cumsum(actual_srt), np.cumsum(weight_srt)
     cumul_actual_pct, cumul_weight_pct = cumul_actual/cumul_actual[-1], cumul_weight/cumul_weight[-1]
     cumul_actual_pct_lag, cumul_weight_pct_lag = np.append(0, cumul_actual_pct[:-1]), np.append(0, cumul_weight_pct[:-1])
@@ -194,9 +194,13 @@ def gini_plot(ax, actual, predicted, weight = None, normalize = True,
     # Gini result:
     gini_rslt = round(gini(actual, predicted, weight, normalize), 5)
 
+    # Dummy weights if none are given:
+    if weight is None:
+        weight = np.ones(len(actual))
+
     # Create plot vectors:
     srt_order = predicted.argsort()
-    pred_srt, actual_srt, weight_srt = np.array(predicted[srt_order]), np.array(actual[srt_order]), np.array(weight[srt_order])
+    pred_srt, actual_srt, weight_srt = np.array(predicted)[srt_order], np.array(actual)[srt_order], np.array(weight)[srt_order]
     cumul_actual, cumul_weight = np.cumsum(actual_srt), np.cumsum(weight_srt)
     cumul_actual_pct, cumul_weight_pct = cumul_actual/cumul_actual[-1], cumul_weight/cumul_weight[-1]
 
