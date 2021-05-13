@@ -310,7 +310,7 @@ def describe_by(dataframe, groupby_var, numeric_var):
     by_desc = dataframe.groupby(groupby_var)[numeric_var].describe().drop('count', axis = 1)
 
     desc_stats = pd.concat([by_cnt, by_cnt_non_null, by_sum, by_desc], axis = 1)
-    del desc_stats.index.name
+    desc_stats.index.name = None
     desc_stats.columns = ['Total Count', 'Non-NaN Count', 'Sum', 'Mean', 'Std. Dev.', 'Min', '25th Pctl',
                           'Median', '75th Pctl', 'Max']
 
