@@ -6,3 +6,5 @@ matplotlib
 seaborn
 sklearn
 itertools
+boto3
+psycopg2
