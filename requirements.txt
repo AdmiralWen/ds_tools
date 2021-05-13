@@ -1,0 +1,8 @@
+# Requirements file, versions not specified yet:
+
+numpy
+pandas
+matplotlib
+seaborn
+sklearn
+itertools

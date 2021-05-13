@@ -1,3 +1,3 @@
-from .DataExploration import *
-from .ModelVisuals import *
-from .MiscFunctions import *
+from .exploration import *
+from .evaluation import *
+from .miscs import *

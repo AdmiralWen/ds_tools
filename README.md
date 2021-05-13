@@ -5,7 +5,16 @@
 
 Contains useful functions for data manipulation, exploration, and modeling. To see example use cases for most of the functions, please refer to the Examples directory.
 
-#### Requirements:
+### Installation:
+`pip install git+http://github.com/AdmiralWen/DataExploration.git`
+
+### Importing the Library:
+For example:
+`from ds_tools import exploration as de`
+`from ds_tools import evaluation as ev`
+`from ds_tools import miscs as ds_misc`
+
+### Requirements:
 - Pandas
 - Numpy
 - Matplotlib
@@ -13,10 +22,10 @@ Contains useful functions for data manipulation, exploration, and modeling. To s
 - Sklearn
 - Itertools
 
-#### Modules & Files:
-- **DataExploration:**
-    - **DataExploration.py:** Useful functions for exploratory data analysis and data manipulation.
-    - **ModoleVisuals.py:** Useful functions for plotting and visualizing modeling results.
-    - **MiscFunctions.py:** Additional miscellaneous functions.
+### Modules & Files:
+- **ds_tools:**
+    - **exploration.py:** Useful functions for exploratory data analysis and data manipulation.
+    - **evaluation.py:** Useful functions for plotting and visualizing modeling results.
+    - **miscs.py:** Additional miscellaneous functions.
 
-- **Examples:** Example use cases.
+- **Examples:** Example code for using this library.
