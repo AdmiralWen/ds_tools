@@ -6,17 +6,17 @@
 Contains useful functions for data manipulation, exploration, and modeling. To see example use cases for most of the functions, please refer to the Examples directory.
 
 ### Installation:
-Installing the library: 
-`pip install git+http://github.com/AdmiralWen/ds_tools.git` 
+Installing the library:  
+`pip install git+http://github.com/AdmiralWen/ds_tools.git`
 
-Updating the library: 
+Updating the library:  
 `pip install --upgrade git+http://github.com/AdmiralWen/ds_tools.git`
 
 ### Importing the Library:
-For example: 
-`from ds_tools import exploration as de` 
-`from ds_tools import evaluation as ev` 
-`from ds_tools import miscs as ds_misc` 
+For example:  
+`from ds_tools import exploration as de`  
+`from ds_tools import evaluation as ev`  
+`from ds_tools import miscs as ds_misc`
 
 ### Requirements:
 - Pandas
