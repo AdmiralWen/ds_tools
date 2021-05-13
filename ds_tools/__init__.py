@@ -1,6 +1,4 @@
-from pkg_resources import get_distribution
-
-__version__ = get_distribution('ds_tools').version
+from ._version import __version__
 
 from .exploration import *
 from .evaluation import *
