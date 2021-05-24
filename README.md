@@ -7,7 +7,7 @@ Contains useful functions for data manipulation, exploration, and modeling. To s
 
 ### Installation:
 To install the library, use one of the following:  
-`pip install git+http://github.com/AdmiralWen/ds_tools.git`  
+`pip install git+https://github.com/AdmiralWen/ds_tools.git`  
 `pip install git+git://github.com/AdmiralWen/ds_tools.git`
 
 Updating the library:  
