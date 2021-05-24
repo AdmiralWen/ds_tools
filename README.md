@@ -6,8 +6,9 @@
 Contains useful functions for data manipulation, exploration, and modeling. To see example use cases for most of the functions, please refer to the Examples directory.
 
 ### Installation:
-Installing the library:  
-`pip install git+http://github.com/AdmiralWen/ds_tools.git`
+To install the library, use one of the following:  
+`pip install git+http://github.com/AdmiralWen/ds_tools.git`  
+`pip install git+git://github.com/AdmiralWen/ds_tools.git`
 
 Updating the library:  
 `pip install --upgrade git+http://github.com/AdmiralWen/ds_tools.git`
@@ -25,6 +26,8 @@ For example:
 - Seaborn
 - Sklearn
 - Itertools
+- Boto3
+- Psycopg2
 
 ### Modules & Files:
 - **ds_tools:**

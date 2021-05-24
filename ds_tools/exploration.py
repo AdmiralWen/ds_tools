@@ -18,7 +18,6 @@ split_column: Splits the input variable into multiple columns according to a del
 weighted_quantile: Returns a series for the quantile or weighted-quantile for a variable; can also be unweighted if desired.
 correlation_heatmap: Returns a correlation matrix heatmap for the variables in a dataframe.
 custom_boxplot: Creates a custom boxplot based on a dataframe of pre-calculated precentile metrics.
-map_multi_level_dict: Converts a series to a multicolumn dummies dataframe based on a mapping dict where the values are a list.
 """
 
 import pandas as pd
