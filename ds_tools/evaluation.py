@@ -18,6 +18,8 @@ import itertools
 from sklearn.metrics import confusion_matrix
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+from exploration import weighted_quantile
+
 ###########
 # General #
 
@@ -219,6 +221,12 @@ def gini_plot(ax, actual, predicted, weight = None, normalize = True,
     ax.tick_params(axis = 'both', which = 'major', labelsize = axis_tick_size)
 
     plt.tight_layout()
+
+def lift_plot():
+    '''
+    Plots a single lift chart given actual, predicted, and weight.
+    '''
+    return weighted_quantile(1, 2)
 
 
 #################
