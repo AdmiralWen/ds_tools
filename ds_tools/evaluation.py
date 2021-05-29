@@ -222,9 +222,9 @@ def gini_plot(ax, actual, predicted, weight = None, normalize = True,
 
     plt.tight_layout()
 
-def lift_plot():
+def single_lift_plot():
     '''
-    Plots a single lift chart given actual, predicted, and weight.
+    Plots a single-lift chart given actual, predicted, and weight.
     '''
     return weighted_quantile(1, 2)
 
