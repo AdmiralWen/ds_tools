@@ -429,12 +429,12 @@ def weighted_quantile(dataframe, var, weight = None, n = 10):
     if weight == None:
         return pd.qcut(dataframe[var], n, labels = False)
     else:
-        dataframe.sort_values(var, ascending = True, inplace = True)
-        cum_sum = dataframe[weight].cumsum()
+        tmp_df = dataframe.sort_values(var, ascending = True, inplace = False)
+        cum_sum = tmp_df[weight].cumsum()
         cutoff = float(cum_sum[-1:])/n
         quantile = cum_sum/cutoff
         quantile[-1:] = n-1
-        return quantile.map(int)
+        return quantile.map(int).reindex(dataframe.index)
 
 def correlation_heatmap(ax, dataframe, vars_list, method = 'pearson', plot_title = 'Correlation Matrix', title_size = 16,
                         x_tick_rotation = 0, axis_tick_size = 14, data_label_size = 14):
