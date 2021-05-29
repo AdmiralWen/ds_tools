@@ -18,7 +18,7 @@ import itertools
 from sklearn.metrics import confusion_matrix
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from exploration import weighted_quantile
+from .exploration import weighted_quantile
 
 ###########
 # General #
