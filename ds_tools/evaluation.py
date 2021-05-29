@@ -4,9 +4,11 @@ Author: Brandon Wen
 
 Contains useful functions for plotting and visualizing modeling results.
 
-plotConfusionMatrix: Plots the confusion matrix heatmap given the true and predicted labels.
-normalizedGini: Computes and/or plots the normalized Gini coefficient given the true and predicted response variables.
-rfFeatureImportance: Plots the feature importance graph for random forest models.
+plot_confusion_matrix: Plots the confusion matrix heatmap given the true and predicted labels.
+gini: Computes the raw or normalized Gini coefficient given the true and predicted labels.
+gini_plot: Plots the Gini Lorenz curve given the true and predicted labels.
+single_lift_plot: Plots a single-lift chart for a given set of actual, predicted, and weight values.
+rf_feature_importance: Plots the feature importance graph for random forest models.
 """
 
 import pandas as pd
