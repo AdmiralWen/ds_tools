@@ -285,7 +285,88 @@ def single_lift_plot(ax, actual, predicted, weight = None, quantiles = 10,
 
     # Weight plot on secondary axis:
     ax2 = ax.twinx()
-    sns.barplot(ax = ax2, data = lift_df_sum, x = 'quantile', y = 'weight', color = 'steelblue', alpha = 0.3)
+    sns.barplot(ax = ax2, data = lift_df_sum, x = 'quantile', y = 'weight', color = 'slategrey', alpha = 0.3)
+    ax2.set_ylim(0, max(lift_df_sum['weight'])*y_axis2_scale)
+
+    # Graph options:
+    ax.set_xticklabels([i+1 for i in range(quantiles)])
+    ax.legend(title = None)
+
+    # Graph and axes titles:
+    ax.set_title(title, size = title_size)
+    ax.set_xlabel(x_axis_label, size = axis_label_size)
+    ax.set_ylabel(y_axis_label, size = axis_label_size)
+    ax.tick_params(axis = 'both', which = 'major', labelsize = axis_tick_size)
+    ax2.set_ylabel(y_axis2_label, size = axis_label_size)
+    ax2.tick_params(axis = 'both', which = 'major', labelsize = axis_tick_size)
+
+    plt.tight_layout()
+
+def double_lift_plot(ax, actual, predicted1, predicted2, weight = None, quantiles = 10,
+                     title = 'Double Lift Plot', x_axis_label = 'Equal-Weight Quantile', y_axis_label = 'Outcome', y_axis2_label = 'Weight',
+                     title_size = 16, axis_label_size = 14, axis_tick_size = 12, y_axis2_scale = 3):
+    '''
+    Plots a double-lift chart for a given set of actual, predicted (predicted1 and predicted2), and weight values. Inputs can be either Pandas
+    series or Numpy arrays. Default number of quantiles is 10. If no weight field is passed, then all observations are assumed to have equal weight.
+    Requires a Matplotlib axis object to be passed to the ax argument The remaining arguments are used to control aesthetics.
+
+    Required Parameters:
+    --------------------
+    ax: a matplotlib axis object
+        Usually defined by plt.subplots().
+    actual: numpy array or pandas series
+        A series/array of the true target variable.
+    predicted1: numpy array or pandas series
+        A series/array of the predicted target labels for the first model to compare.
+    predicted2: numpy array or pandas series
+        A series/array of the predicted target labels for the second model to compare.
+    weight: numpy array or pandas series
+        Used this to specify weighted Gini coefficient, default None.
+    quantiles: integer
+        Specify the number of quantile groups, default is 10 (deciles).
+
+    Returns:
+    --------------------
+    None; wrap function into a plt.subplot() block to create plots. See Example.
+
+    Example:
+    --------------------
+    >> import random
+    >> t = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6])
+    >> p = np.array([0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.31, 0.4, 0.73, 0.31, 0.4, 0.6, 0.2, 0.32, 0.53, 0.74, 0.1, 0.34,
+                     0.9, 0.2, 0.11, 0.71, 0.3, 0.51, 0.61, 0.72, 0.52, 0.29, 0.8])
+    >> w = np.array([8, 3, 4, 9, 6, 2, 13, 8, 11, 8, 7, 9, 8, 5, 13, 2, 7, 10, 16, 6, 8, 10, 1, 11, 15, 14, 7, 10, 12, 11])
+    >> r = np.array([round(random.random(), 1) for i in range(30)])
+
+    >> fig, ax = plt.subplots(figsize = (6, 6))
+    >> single_lift_plot(ax, actual = t, predicted1 = r, predicted2 = p, weight = w, title = 'Example Plot - Simulated against Random')
+    >> plt.show()
+    '''
+
+    # Create uniform weights if weight = None:
+    if weight is None:
+        weight = np.ones(len(actual))
+
+    # Create ratio of predicted values, aggregate by weighted quantile:
+    lift_df = pd.DataFrame(np.stack([weight, actual, predicted1, predicted2], axis = 1), columns = ['weight', 'actual_raw', 'predicted1_raw', 'predicted2_raw'])
+    lift_df['pred_ratio'] = lift_df['predicted1_raw']/lift_df['predicted2_raw']
+    lift_df['quantile'] = weighted_quantile(lift_df, 'pred_ratio', weight = 'weight', n = quantiles)
+    lift_df_sum = lift_df.groupby(by = 'quantile', as_index = False).agg({'weight':'sum', 'actual_raw':'sum', 'predicted1_raw':'sum', 'predicted2_raw':'sum'})
+
+    # Create weighted averages and melt:
+    lift_df_sum['Actual'] = lift_df_sum['actual_raw']/lift_df_sum['weight']
+    lift_df_sum['Predicted1'] = lift_df_sum['predicted1_raw']/lift_df_sum['weight']
+    lift_df_sum['Predicted2'] = lift_df_sum['predicted2_raw']/lift_df_sum['weight']
+
+    melt_vars = ['quantile', 'weight', 'Actual', 'Predicted1', 'Predicted2']
+    lift_df_sum2 = lift_df_sum[melt_vars].melt(id_vars = ['quantile', 'weight'], var_name = ['actual_pred'], value_name = 'ratio')
+
+    # Lift lines plot:
+    sns.lineplot(ax = ax, data = lift_df_sum2, x = 'quantile', y = 'ratio', hue = 'actual_pred', palette = sns.color_palette(['darkred', 'limegreen', 'teal']))
+
+    # Weight plot on secondary axis:
+    ax2 = ax.twinx()
+    sns.barplot(ax = ax2, data = lift_df_sum, x = 'quantile', y = 'weight', color = 'slategrey', alpha = 0.3)
     ax2.set_ylim(0, max(lift_df_sum['weight'])*y_axis2_scale)
 
     # Graph options:
