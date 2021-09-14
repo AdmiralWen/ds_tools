@@ -16,8 +16,7 @@ Updating the library:
 ### Importing the Library:
 For example:  
 `from ds_tools import exploration as de`  
-`from ds_tools import evaluation as ev`  
-`from ds_tools import miscs as ds_misc`
+`from ds_tools import evaluation as ev`
 
 ### Requirements:
 - Pandas
@@ -26,13 +25,10 @@ For example:
 - Seaborn
 - Sklearn
 - Itertools
-- Boto3
-- Psycopg2
 
 ### Modules & Files:
 - **ds_tools:**
     - **exploration.py:** Useful functions for exploratory data analysis and data manipulation.
     - **evaluation.py:** Useful functions for plotting and visualizing modeling results.
-    - **miscs.py:** Additional miscellaneous functions.
 
 - **Examples:** Example code for using this library.
