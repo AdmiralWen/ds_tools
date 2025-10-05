@@ -1,6 +1,7 @@
 """
 Ranking Evaluation Metrics
 Author: Brandon Wen
+Copyright (c) 2025 Brandon Wen
 
 Contains metrics for evaluating ranking models and search indices. All evaluation functions in this module
 assumes that you have your evaluation data prepared as a pandas dataframe, where each row represents a query
