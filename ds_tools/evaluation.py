@@ -76,7 +76,7 @@ def plot_confusion_matrix(ax, true_labels, pred_labels, normalize = False, cmap 
     if show_colorbar:
         divider = make_axes_locatable(ax)
         cax = divider.append_axes('right', size = '5%', pad = 0.1)
-        fig.colorbar(im, cax = cax, orientation = 'vertical')
+        ax.colorbar(im, cax = cax, orientation = 'vertical')
 
     # Title and X/Y labels:
     ax.set_title(title, size = title_size)
