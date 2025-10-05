@@ -1,6 +1,7 @@
 """
 Modeling and Evaluation Visualizations
 Author: Brandon Wen
+Copyright (c) 2018 Brandon Wen
 
 Contains useful functions for plotting and visualizing modeling results.
 
